@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:13
+    container_name: oxalis-postgres
+    environment:
+      POSTGRES_USER: oxalis
+      POSTGRES_PASSWORD: oxalis
+      POSTGRES_DB: oxalisdb
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  oxalis:
+    image: difi/oxalis:latest
+    container_name: oxalis-ap
+    depends_on:
+      - postgres
+    ports:
+      - "8080:8080"
+    environment:
+      - JAVA_OPTS=-Dspring.datasource.url=jdbc:postgresql://postgres:5432/oxalisdb -Dspring.datasource.username=oxalis -Dspring.datasource.password=oxalis
+    volumes:
+      - ./oxalis/config:/opt/oxalis/conf
+      - ./oxalis/inbound:/opt/oxalis/inbound
+      - ./oxalis/outbound:/opt/oxalis/outbound
+
+volumes:
+  postgres_data:
+  
